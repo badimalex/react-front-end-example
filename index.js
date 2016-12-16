@@ -36,7 +36,7 @@ const Image = ({src, width, height, alt}) => (
 
 // textBox component
 const TextBox = ({text}) => (
-  DOM.span(null, `${text}`)
+  DOM.span(null, text)
 );
 
 // BlogItem component
