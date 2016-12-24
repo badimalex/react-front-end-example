@@ -53,6 +53,13 @@ const Image = ({src, width, height, alt}) => (
   )
 );
 
+const ImageShape = PropTypes.shape({
+  src: PropTypes.string,
+  width: PropTypes.number,
+  height: PropTypes.number,
+  alt: PropTypes.string,
+}).isRequired;
+
 Image.defaultProps = {
   src: 'https://vk.com/images/camera_50.png',
   width: 50,
@@ -60,12 +67,7 @@ Image.defaultProps = {
   alt: 'No avatar'
 }
 
-Image.propTypes = {
-  src: PropTypes.string,
-  width: PropTypes.number,
-  height: PropTypes.number,
-  alt: PropTypes.string,
-}
+Image.propTypes = ImageShape;
 
 // textBox component
 const TextBox = ({text}) => (
@@ -130,12 +132,13 @@ class BlogItem extends React.Component {
     );
   }
 }
-
-BlogItem.propTypes = {
-  image: PropTypes.object,
+const BlogItemShape = PropTypes.shape({
+  image: ImageShape,
   text: PropTypes.string,
   meta: PropTypes.object,
-}
+}).isRequired;
+
+BlogItem.propTypes = BlogItemShape;
 
 // BlogList
 const BlogList = ({posts}) => (
@@ -152,7 +155,7 @@ const BlogList = ({posts}) => (
 );
 
 BlogList.propTypes = {
-  posts: PropTypes.array
+  posts: React.PropTypes.arrayOf(BlogItemShape)
 }
 
 class BlogPage extends React.Component {
@@ -168,7 +171,7 @@ class BlogPage extends React.Component {
 }
 
 BlogPage.propTypes = {
-  posts: PropTypes.array
+  posts: React.PropTypes.arrayOf(BlogItemShape)
 }
 
 ReactDOM.render(
