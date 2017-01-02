@@ -148,6 +148,32 @@ BlogList.propTypes = {
   posts: React.PropTypes.arrayOf(BlogItemShape)
 }
 
+class PieChart extends React.Component {
+  componentDidMount() {
+    this.chart = c3.generate({
+      bindto: ReactDOM.findDOMNode(this.refs.chart),
+      data: {
+        columns: this.props.columns,
+        type : 'pie',
+      }
+    })
+  }
+
+  componentWillUnmount() {
+    this.chart.destroy();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.chart.load(nextProps);
+  }
+
+  render() {
+    return (
+      <div ref="chart" />
+    );
+  }
+}
+
 class BlogPage extends React.Component {
   constructor(props) {
     super(props);
@@ -161,9 +187,18 @@ class BlogPage extends React.Component {
     this.setState({ posts: posts });
   }
 
+  getChartData() {
+    return _.map(posts, (p)=> [p.text, p.meta.likes] )
+  }
+
   render() {
     const { posts } = this.state;
-    return React.createElement(BlogList, { posts, likeHandler: this.likeHandler });
+    return (
+      <div className="blog-page">
+        <BlogList posts={posts} likeHandler={ this.likeHandler} />
+        <PieChart columns={this.getChartData()} />
+      </div>
+    )
   }
 }
 
@@ -172,6 +207,6 @@ BlogPage.propTypes = {
 }
 
 ReactDOM.render(
-  React.createElement(BlogPage),
+  <BlogPage />,
   document.getElementById('app')
 );
