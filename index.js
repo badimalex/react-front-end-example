@@ -3,6 +3,7 @@ const { bind } = _;
 
 const posts = [
   {
+    "id":1,
     "image": {
       "src": "https://facebook.github.io/react/img/logo.svg",
       "width": 36,
@@ -17,6 +18,7 @@ const posts = [
     }
   },
   {
+    "id":2,
     "image": {
       "src": "https://facebook.github.io/react/img/logo.svg",
       "width": 36,
@@ -31,6 +33,7 @@ const posts = [
     }
   },
   {
+    "id":3,
     "image": {
       "src": "https://facebook.github.io/react/img/logo.svg",
       "width": 36,
@@ -79,26 +82,12 @@ TextBox.propTypes = {
 }
 
 // Like component
-class Like extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { count: props.count }
-    this.handleClick = bind(this.handleClick, this);
-  }
-
-  handleClick(e) {
-    this.setState({count: this.state.count+1 })
-  }
-
-  render() {
-    return (
-      <div>
-        <span>Likes: {this.state.count}</span>
-        <button onClick={this.handleClick}>+</button>
-      </div>
-    )
-  }
-}
+const Like = ({likes, likeHandler}) => (
+  <div>
+    <span>Likes: {likes}</span>
+    <button onClick={likeHandler}>+</button>
+  </div>
+);
 
 Like.propTypes = {
   count: PropTypes.number
@@ -107,7 +96,7 @@ Like.propTypes = {
 // BlogItem component
 class BlogItem extends React.Component {
    render() {
-   const { image, text, meta } = this.props;
+   const { image, text, meta, likeHandler } = this.props;
     return (
       React.createElement(
         "div",
@@ -126,12 +115,13 @@ class BlogItem extends React.Component {
         ),
         React.createElement(
           Like,
-          { count: meta.likes }
+          { likes: meta.likes, likeHandler: likeHandler }
         )
       )
     );
   }
 }
+
 const BlogItemShape = PropTypes.shape({
   image: ImageShape,
   text: PropTypes.string,
@@ -141,14 +131,14 @@ const BlogItemShape = PropTypes.shape({
 BlogItem.propTypes = BlogItemShape;
 
 // BlogList
-const BlogList = ({posts}) => (
+const BlogList = ({posts, likeHandler}) => (
   React.createElement(
     "div",
     { className: 'blog-list' },
     _.map(
       posts,
-      (post, key) => (
-        React.createElement( BlogItem, _.assign(post, {key}) )
+      (post) => (
+        <BlogItem key={post.id} {...post} likeHandler={ () => likeHandler(post.id) } />
       )
     )
   )
@@ -162,11 +152,18 @@ class BlogPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = { posts };
+    this.likeHandler = bind(this.likeHandler, this);
+  }
+
+  likeHandler(id) {
+    let post = _.find(posts, (o) => o.id == id );
+    post.meta.likes += 1;
+    this.setState({ posts: posts });
   }
 
   render() {
     const { posts } = this.state;
-    return React.createElement(BlogList, { posts });
+    return React.createElement(BlogList, { posts, likeHandler: this.likeHandler });
   }
 }
 
